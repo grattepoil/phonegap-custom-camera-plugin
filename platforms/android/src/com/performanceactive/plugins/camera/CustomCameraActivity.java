@@ -1,14 +1,19 @@
 
 package com.performanceactive.plugins.camera;
 
+import static android.hardware.Camera.Parameters.FOCUS_MODE_AUTO;
+import static android.hardware.Camera.Parameters.FOCUS_MODE_MACRO;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
@@ -26,17 +31,10 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-
-import static android.hardware.Camera.Parameters.FOCUS_MODE_AUTO;
-import static android.hardware.Camera.Parameters.FOCUS_MODE_MACRO;
-
 public class CustomCameraActivity extends Activity {
 
     private static final String TAG = CustomCameraActivity.class.getSimpleName();
-    private static final float ASPECT_RATIO = 126.0f / 86;
+//  private static final float ASPECT_RATIO = 126.0f / 86;
 
     public static String FILENAME = "Filename";
     public static String QUALITY = "Quality";
@@ -60,130 +58,128 @@ public class CustomCameraActivity extends Activity {
         layout = new RelativeLayout(this);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         layout.setLayoutParams(layoutParams);
+        
         createCameraPreview();
         createTopLeftBorder();
         createTopRightBorder();
         createBottomLeftBorder();
         createBottomRightBorder();
-        layoutBottomBorderImagesRespectingAspectRatio();
+        //layoutBottomBorderImagesRespectingAspectRatio();
         createCaptureButton();
         setContentView(layout);
     }
 
     private void createCameraPreview() {
         cameraPreviewView = new FrameLayout(this);
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);
         cameraPreviewView.setLayoutParams(layoutParams);
         layout.addView(cameraPreviewView);
     }
 
     private void createTopLeftBorder() {
-        borderTopLeft = new ImageView(this);
-        setBitmap(borderTopLeft, "border_top_left.png");
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(dpToPixels(50), dpToPixels(50));
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        if (isXLargeScreen()) {
-            layoutParams.topMargin = dpToPixels(100);
-            layoutParams.leftMargin = dpToPixels(100);
-        } else if (isLargeScreen()) {
-            layoutParams.topMargin = dpToPixels(50);
-            layoutParams.leftMargin = dpToPixels(50);
-        } else {
-            layoutParams.topMargin = dpToPixels(10);
-            layoutParams.leftMargin = dpToPixels(10);
-        }
+		borderTopLeft = new ImageView(this);
+		
+		borderTopLeft.setAlpha(0.7f);
+		borderTopLeft.setScaleX(2.9f);
+		borderTopLeft.setScaleY(2.9f);
+
+        setBitmap(borderTopLeft, "carre-camera-1500.png");
+
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);
+        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
         borderTopLeft.setLayoutParams(layoutParams);
+        borderTopLeft.setTranslationY(dpToPixels(-(75/2))); 
+        
         layout.addView(borderTopLeft);
     }
 
     private void createTopRightBorder() {
         borderTopRight = new ImageView(this);
-        setBitmap(borderTopRight, "border_top_right.png");
+        //setBitmap(borderTopRight, "border_top_right.png");
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(dpToPixels(50), dpToPixels(50));
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        if (isXLargeScreen()) {
-            layoutParams.topMargin = dpToPixels(100);
-            layoutParams.rightMargin = dpToPixels(100);
-        } else if (isLargeScreen()) {
-            layoutParams.topMargin = dpToPixels(50);
-            layoutParams.rightMargin = dpToPixels(50);
-        } else {
-            layoutParams.topMargin = dpToPixels(10);
-            layoutParams.rightMargin = dpToPixels(10);
-        }
+//        if (isXLargeScreen()) {
+//            layoutParams.topMargin = dpToPixels(100);
+//            layoutParams.rightMargin = dpToPixels(100);
+//        } else if (isLargeScreen()) {
+//            layoutParams.topMargin = dpToPixels(50);
+//            layoutParams.rightMargin = dpToPixels(50);
+//        } else {
+//            layoutParams.topMargin = dpToPixels(10);
+//            layoutParams.rightMargin = dpToPixels(10);
+//        }
         borderTopRight.setLayoutParams(layoutParams);
         layout.addView(borderTopRight);
     }
 
     private void createBottomLeftBorder() {
         borderBottomLeft = new ImageView(this);
-        setBitmap(borderBottomLeft, "border_bottom_left.png");
+        //setBitmap(borderBottomLeft, "border_bottom_left.png");
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(dpToPixels(50), dpToPixels(50));
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        if (isXLargeScreen()) {
-            layoutParams.leftMargin = dpToPixels(100);
-        } else if (isLargeScreen()) {
-            layoutParams.leftMargin = dpToPixels(50);
-        } else {
-            layoutParams.leftMargin = dpToPixels(10);
-        }
+//        if (isXLargeScreen()) {
+//            layoutParams.leftMargin = dpToPixels(100);
+//        } else if (isLargeScreen()) {
+//            layoutParams.leftMargin = dpToPixels(50);
+//        } else {
+//            layoutParams.leftMargin = dpToPixels(10);
+//        }
         borderBottomLeft.setLayoutParams(layoutParams);
         layout.addView(borderBottomLeft);
     }
 
     private void createBottomRightBorder() {
         borderBottomRight = new ImageView(this);
-        setBitmap(borderBottomRight, "border_bottom_right.png");
+        //setBitmap(borderBottomRight, "border_bottom_right.png");
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(dpToPixels(50), dpToPixels(50));
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        if (isXLargeScreen()) {
-            layoutParams.rightMargin = dpToPixels(100);
-        } else if (isLargeScreen()) {
-            layoutParams.rightMargin = dpToPixels(50);
-        } else {
-            layoutParams.rightMargin = dpToPixels(10);
-        }
+//        if (isXLargeScreen()) {
+//            layoutParams.rightMargin = dpToPixels(100);
+//        } else if (isLargeScreen()) {
+//            layoutParams.rightMargin = dpToPixels(50);
+//        } else {
+//            layoutParams.rightMargin = dpToPixels(10);
+//        }
         borderBottomRight.setLayoutParams(layoutParams);
         layout.addView(borderBottomRight);
     }
 
-    private void layoutBottomBorderImagesRespectingAspectRatio() {
-        RelativeLayout.LayoutParams borderTopLeftLayoutParams = (RelativeLayout.LayoutParams)borderTopLeft.getLayoutParams();
-        RelativeLayout.LayoutParams borderTopRightLayoutParams = (RelativeLayout.LayoutParams)borderTopRight.getLayoutParams();
-        RelativeLayout.LayoutParams borderBottomLeftLayoutParams = (RelativeLayout.LayoutParams)borderBottomLeft.getLayoutParams();
-        RelativeLayout.LayoutParams borderBottomRightLayoutParams = (RelativeLayout.LayoutParams)borderBottomRight.getLayoutParams();
-        float height = (screenWidthInPixels() - borderTopRightLayoutParams.rightMargin - borderTopLeftLayoutParams.leftMargin) * ASPECT_RATIO;
-        borderBottomLeftLayoutParams.bottomMargin = screenHeightInPixels() - Math.round(height) - borderTopLeftLayoutParams.topMargin;
-        borderBottomLeft.setLayoutParams(borderBottomLeftLayoutParams);
-        borderBottomRightLayoutParams.bottomMargin = screenHeightInPixels() - Math.round(height) - borderTopRightLayoutParams.topMargin;
-        borderBottomRight.setLayoutParams(borderBottomRightLayoutParams);
-    }
+//    private void layoutBottomBorderImagesRespectingAspectRatio() {
+//        RelativeLayout.LayoutParams borderTopLeftLayoutParams = (RelativeLayout.LayoutParams)borderTopLeft.getLayoutParams();
+//        RelativeLayout.LayoutParams borderTopRightLayoutParams = (RelativeLayout.LayoutParams)borderTopRight.getLayoutParams();
+//        RelativeLayout.LayoutParams borderBottomLeftLayoutParams = (RelativeLayout.LayoutParams)borderBottomLeft.getLayoutParams();
+//        RelativeLayout.LayoutParams borderBottomRightLayoutParams = (RelativeLayout.LayoutParams)borderBottomRight.getLayoutParams();
+//        float height = (screenWidthInPixels() - borderTopRightLayoutParams.rightMargin - borderTopLeftLayoutParams.leftMargin) * ASPECT_RATIO;
+//        borderBottomLeftLayoutParams.bottomMargin = screenHeightInPixels() - Math.round(height) - borderTopLeftLayoutParams.topMargin;
+//        borderBottomLeft.setLayoutParams(borderBottomLeftLayoutParams);
+//        borderBottomRightLayoutParams.bottomMargin = screenHeightInPixels() - Math.round(height) - borderTopRightLayoutParams.topMargin;
+//        borderBottomRight.setLayoutParams(borderBottomRightLayoutParams);
+//    }
 
-    private int screenWidthInPixels() {
-        Point size = new Point();
-        getWindowManager().getDefaultDisplay().getSize(size);
-        return size.x;
-    }
-
-    private int screenHeightInPixels() {
-        Point size = new Point();
-        getWindowManager().getDefaultDisplay().getSize(size);
-        return size.y;
-    }
+//    private int screenWidthInPixels() {
+//        Point size = new Point();
+//        getWindowManager().getDefaultDisplay().getSize(size);
+//        return size.x;
+//    }
+//
+//    private int screenHeightInPixels() {
+//        Point size = new Point();
+//        getWindowManager().getDefaultDisplay().getSize(size);
+//        return size.y;
+//    }
 
     private void createCaptureButton() {
         captureButton = new ImageButton(getApplicationContext());
         setBitmap(captureButton, "capture_button.png");
-        captureButton.setBackgroundColor(Color.TRANSPARENT);
+        captureButton.setBackgroundColor(Color.parseColor("#90226a"));
         captureButton.setScaleType(ScaleType.FIT_CENTER);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(dpToPixels(75), dpToPixels(75));
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, dpToPixels(75));
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        layoutParams.bottomMargin = dpToPixels(10);
+        //layoutParams.bottomMargin = dpToPixels(10);
         captureButton.setLayoutParams(layoutParams);
         captureButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -254,15 +250,15 @@ public class CustomCameraActivity extends Activity {
         return Math.round(dp * density);
     }
 
-    private boolean isXLargeScreen() {
-        int screenLayout = getResources().getConfiguration().screenLayout;
-        return (screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE;
-    }
-
-    private boolean isLargeScreen() {
-        int screenLayout = getResources().getConfiguration().screenLayout;
-        return (screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }
+//    private boolean isXLargeScreen() {
+//        int screenLayout = getResources().getConfiguration().screenLayout;
+//        return (screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE;
+//    }
+//
+//    private boolean isLargeScreen() {
+//        int screenLayout = getResources().getConfiguration().screenLayout;
+//        return (screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE;
+//    }
 
     private void setBitmap(ImageView imageView, String imageName) {
         try {
