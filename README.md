@@ -7,7 +7,7 @@ Phonegap plugin which allows the caller to customise a camera preview, including
 - Add the plugin ID and version to the config.xml.
 
 ```
-<gap:plugin name="com.performanceactive.plugins.camera" version="1.0" />
+<gap:plugin name="com.leadoff.plugins.camera" version="1.0" />
 ```
 
 - Add custom images for the capture button and borders to your project. The image locations under the Phonegap www directory cannot currently be modified.
